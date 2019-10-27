@@ -6,7 +6,9 @@ from pymongo import MongoClient
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
+    # INPUT DETAILS
     parser.add_argument('--test_size', type=int, required=True)
+
     return parser.parse_args()
 
 
@@ -23,12 +25,14 @@ def create_rand(insert_size):
 def bulk_insert(create_test):
     mongo_client = MongoClient()
     db = mongo_client.replicasetdb
-    db.insert_many(create_test)
+    col = db.mycollection
+    col.insert_many(create_test)
 
 
 if __name__ == '__main__':
     args = parse_arguments()
-    insert_size = args["test_size"]
+
+    insert_size = args.test_size
     create_test = create_rand(insert_size)
     # get currant time
     start_time = timeit.default_timer()
