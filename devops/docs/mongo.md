@@ -6,9 +6,6 @@
 ```
 sudo apt-get update && sudo apt-get upgrade -y 
 ```
-
-
-
 ### install run mongodb 
 
 - install the packages required for adding a new repository:
