@@ -20,7 +20,7 @@ def parse_arguments():
 def open_streaming(topic, ZK_opt):
     sc = SparkContext(appName="PythonStreamingRecieverKafkaWordCount")
     ssc = StreamingContext(sc, 2)
-    kvs = KafkaUtils.createStream(ssc, "raw - event - streaming - consumer", {topic: 1})
+    kvs =KafkaUtils.createStream(ssc, '10.128.0.16:2181', 'spark-streaming', {topic: 1})
     return kvs, sc, ssc
 
 
