@@ -32,6 +32,3 @@ sudo nano spark-env.sh
 cp slaves.template slaves
 sudo nano slaves
 ```
-
-
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC832BKS+XElaQ/pDJA+BsrRAAyAMy76s6SDcnjUwHpsqWUtxLmqtDyvi66swTamBFO9FVe3k4XrMTRiIz8NZUl/zYSpqZ2NjF9jhnMqr1LNtSmxZLKOJtpI+MmOkFgXbaQ0F79ZeUtWxfF7dlkNyc/1yOk4Z7ag6fjcbX8TcUQbAiGRp1yiMDBEQ2bPZTDUfQS6d+Jmzq8msfo21DrEhgq8Um5N4D8GCb9dwt1UfdyyWa8fE96PwSXv1/vZQYBrv/wA4du7xdBPjR2IOhJXlox/7w/5P8g8vEAtf9MhKNPcPqt1jjvkEJd5BhZNOPxphFSX2lYKAVjAvsLbIkHT1+T alialimohamed475@mongo1
