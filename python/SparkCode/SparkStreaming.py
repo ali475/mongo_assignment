@@ -2,8 +2,6 @@ import argparse
 from pyspark import SparkContext, SparkConf
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
-import pymongo_spark
-pymongo_spark.activate()
 
 from uuid import uuid1
 
