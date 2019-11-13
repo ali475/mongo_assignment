@@ -24,11 +24,17 @@ def open_streaming(topic, ZK_opt):
     return kvs, sc, ssc
 
 
+def printing(word):
+    print(word)
+    return word
+
+
 if __name__ == '__main__':
     args = parse_arguments()
     kvs, sc, ssc = open_streaming(args.topic_name, args.ZK_opt)
     lines = kvs.map(lambda x: x[1])
     counts = lines.flatMap(lambda line: line.split(" ")).map(lambda word: (word, 1)).reduceByKey(lambda a, b: a+b)
+    counts.map(lambda word: printing(word))
     counts.pprint()
     ssc.start()
     ssc.awaitTermination()
