@@ -1,5 +1,6 @@
 import argparse
 from pyspark import SparkContext, SparkConf
+from pyspark.sql import SparkSession
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
 
