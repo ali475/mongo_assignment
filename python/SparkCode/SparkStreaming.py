@@ -35,7 +35,7 @@ if __name__ == '__main__':
         .config("spark.mongodb.input.uri", "mongodb://{}/sparkkafka.stream".format(args.mongo_server)).getOrCreate()
     sparkContext = my_spark.sparkContext
     ssc = StreamingContext(sparkContext, 2)
-    kvs = KafkaUtils.createStream(ssc=ssc, zkQuorum=args.ZK_opt, topics={args.topic_name: 3})
+    kvs = KafkaUtils.createStream(ssc=ssc, zkQuorum=args.ZK_opt,groupId="reading kafka", topics={args.topic_name: 3})
     kvs.pprint()
     ssc.start()
     ssc.awaitTermination()
