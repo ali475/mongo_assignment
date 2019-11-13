@@ -20,16 +20,6 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def open_streaming(topic, ZK_opt, mongo_host):
-    my_spark = SparkSession \
-        .builder \
-        .appName("myApp") \
-        .config("spark.mongodb.input.uri", "mongodb://{}/sparkkafka.stream".format(mongo_host)) \
-        .getOrCreate()
-    sc = my_spark.sparkContext
-    ssc = StreamingContext(sc, 2)
-    kvs =KafkaUtils.createStream(ssc, ZK_opt, 'spark-streaming', {topic: 1})
-    return kvs, sc, ssc
 
 
 def printing(word):
@@ -39,11 +29,13 @@ def printing(word):
 
 if __name__ == '__main__':
     args = parse_arguments()
-    kvs, sc, ssc = open_streaming(args.topic_name, args.ZK_opt, args.mongo_server)
-    lines = kvs.map(lambda x: x[1])
-    counts = lines.flatMap(lambda line: line.split(" ")).map(lambda word: (word, 1)).reduceByKey(lambda a, b: a+b)
-    counts.map(lambda word: printing(word))
-    counts.write.format("com.mongodb.spark.sql.DefaultSource").mode("append").save()
-
+    my_spark = SparkSession\
+        .builder\
+        .appName("streaming from kafka to mongo")\
+        .config("spark.mongodb.input.uri", "mongodb://{}/sparkkafka.stream".format(args.mongo_host)).getOrCreate()
+    sparkContext = my_spark.sparkContext
+    ssc = StreamingContext(sparkContext, 2)
+    kvs = KafkaUtils.createStream(ssc=ssc, zkQuorum=args.ZK_opt, topics={args.topic_name: 3})
+    kvs.pprint()
     ssc.start()
     ssc.awaitTermination()
