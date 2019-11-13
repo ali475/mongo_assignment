@@ -32,7 +32,7 @@ if __name__ == '__main__':
     my_spark = SparkSession\
         .builder\
         .appName("streaming from kafka to mongo")\
-        .config("spark.mongodb.input.uri", "mongodb://{}/sparkkafka.stream".format(args.mongo_host)).getOrCreate()
+        .config("spark.mongodb.input.uri", "mongodb://{}/sparkkafka.stream".format(args.mongo_server)).getOrCreate()
     sparkContext = my_spark.sparkContext
     ssc = StreamingContext(sparkContext, 2)
     kvs = KafkaUtils.createStream(ssc=ssc, zkQuorum=args.ZK_opt, topics={args.topic_name: 3})
