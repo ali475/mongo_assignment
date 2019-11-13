@@ -15,7 +15,7 @@ def parse_arguments():
     # INPUT DETAILS
     parser.add_argument("--topic_name", type=str, required=True)
     parser.add_argument('--ZK_opt', type=str, required=True)
-    parser.add_argument('--mongo_sever', type=str, required=True)
+    parser.add_argument('--mongo_server', type=str, required=True)
     return parser.parse_args()
 
 
