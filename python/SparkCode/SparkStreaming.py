@@ -1,41 +1,26 @@
-import argparse
-from pyspark import SparkContext, SparkConf
+import sys
+from pyspark.sql.functions import udf
 from pyspark.sql import SparkSession
-from pyspark.streaming import StreamingContext
-from pyspark.streaming.kafka import KafkaUtils
-
-from uuid import uuid1
 
 
-# sc = SparkContext(appName="PythonSparkStreamingKafka")
-# sc.setLogLevel("WARN")
-mongo_url = "mongodb://{}:27017/"
+if __name__ == "__main__":
+    spark = SparkSession \
+        .builder \
+        .appName("StructuredNetworkWordCount") \
+        .config("spark.mongodb.input.uri", "mongodb://10.128.0.19:27017/twitter.test") \
+        .config("spark.mongodb.output.uri", "mongodb://10.128.0.19:27017/twitter.test") \
+        .getOrCreate()
+    events = spark \
+        .readStream \
+        .format("kafka") \
+        .option("kafka.bootstrap.servers", "10.128.0.19:9092,10.128.0.16:9092,10.128.0.20:9092") \
+        .option("subscribe", "testo") \
+        .load()
+    events = events.selectExpr("CAST(value as String)")
 
-def parse_arguments():
-    parser = argparse.ArgumentParser()
-    # INPUT DETAILS
-    parser.add_argument("--topic_name", type=str, required=True)
-    parser.add_argument('--ZK_opt', type=str, required=True)
-    parser.add_argument('--mongo_server', type=str, required=True)
-    return parser.parse_args()
-
-
-
-
-def printing(word):
-    print(word)
-    return word
-
-
-if __name__ == '__main__':
-    args = parse_arguments()
-    my_spark = SparkSession\
-        .builder\
-        .appName("streaming from kafka to mongo")\
-        .config("spark.mongodb.input.uri", "mongodb://{}/sparkkafka.stream".format(args.mongo_server)).getOrCreate()
-    sparkContext = my_spark.sparkContext
-    ssc = StreamingContext(sparkContext, 2)
-    kvs = KafkaUtils.createStream(ssc=ssc, zkQuorum=args.ZK_opt,groupId="reading-kafka", topics={args.topic_name: 3})
-    kvs.pprint()
-    ssc.start()
-    ssc.awaitTermination()
+    mongooutput = events \
+        .writeStream \
+        .format("com.mongodb.spark.sql.DefaultSource") \
+        .option("com.mongodb.spark.sql.DefaultSource", "mongodb://localhost:27017/twitter.test") \
+        .start()
+    mongooutput.awaitTermination()
