@@ -13,6 +13,7 @@ from pyspark.sql import SparkSession
 
 def write_mongo(rdd):
     print("entering function with data ")
+    print(rdd)
     NAME = 'test'
     COLLECTION_MONGODB = 'test'
     try:
