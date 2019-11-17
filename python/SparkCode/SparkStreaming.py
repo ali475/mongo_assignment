@@ -12,6 +12,7 @@ from pyspark.sql import SparkSession
 
 
 def write_mongo(rdd):
+    print("entering function with data ")
     NAME = 'test'
     COLLECTION_MONGODB = 'test'
     try:
@@ -19,6 +20,7 @@ def write_mongo(rdd):
             .format('com.mongodb.spark.sql.DefaultSource').mode('append') \
             .option('database', NAME).option('collection', COLLECTION_MONGODB).save()
     except:
+        print("error")
         pass
 
 
