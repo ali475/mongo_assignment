@@ -15,7 +15,6 @@ from pyspark.sql import SparkSession
 def write_mongo(rdd):
     NAME = 'test'
     COLLECTION_MONGODB = 'test'
-    rdd.pprint()
     try:
         rdd.write\
           .format('com.mongodb.spark.sql.DefaultSource').mode('append')\
