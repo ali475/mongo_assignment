@@ -11,17 +11,15 @@ from pyspark.streaming.kafka import KafkaUtils
 from pyspark.sql import SparkSession
 
 
-
 def write_mongo(rdd):
     NAME = 'test'
     COLLECTION_MONGODB = 'test'
     try:
-        rdd.write\
-          .format('com.mongodb.spark.sql.DefaultSource').mode('append')\
-          .option('database',NAME).option('collection',COLLECTION_MONGODB).save()
+        rdd.write \
+            .format('com.mongodb.spark.sql.DefaultSource').mode('append') \
+            .option('database', NAME).option('collection', COLLECTION_MONGODB).save()
     except:
         pass
-    
 
 
 n_secs = 1
@@ -34,10 +32,15 @@ spark_session = SparkSession.builder \
 sc = spark_session.sparkContext
 sc.setLogLevel("WARN")
 ssc = StreamingContext(sc, n_secs)
-kafkaStream = KafkaUtils.createStream(ssc, "10.128.0.16:2181","kafkaReaders", {topic: 3})
+kafkaParams = {
+    "metadata.broker.list": "10.128.0.20:9092,10.128.0.19:9092,10.128.0.16:9092",
+    "auto.offset.reset": "smallest"
+}
+kafkaStream = KafkaUtils.createDirectStream(ssc, [topic], kafkaParams)
+# (ssc, "10.128.0.16:2181","kafkaReaders", {topic: 3})
 lines = kafkaStream.map(lambda x: x[1])
 
-counts = lines.flatMap(lambda line: line.split(" ")).map(lambda word: (word, 1)).reduceByKey(lambda a, b: a+b)\
+counts = lines.flatMap(lambda line: line.split(" ")).map(lambda word: (word, 1)).reduceByKey(lambda a, b: a + b) \
     .foreachRDD(lambda rdd: write_mongo(rdd))
 ssc.start()
 ssc.awaitTermination()
