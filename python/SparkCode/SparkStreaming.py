@@ -13,7 +13,7 @@ from pyspark.sql import SparkSession
 
 def write_mongo(rdd):
     print("entering function with data ")
-    rdd.foreach(print)
+    rdd.foreach(lambda x: print(x))
     NAME = 'test'
     COLLECTION_MONGODB = 'test'
     try:
