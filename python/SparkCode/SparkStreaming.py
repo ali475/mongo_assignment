@@ -9,6 +9,21 @@ from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
 
 from pyspark.sql import SparkSession
+
+
+
+def write_mongo(rdd):
+    NAME = 'test'
+    COLLECTION_MONGODB = 'test'
+    try:
+        rdd.write\
+          .format('com.mongodb.spark.sql.DefaultSource').mode('append')\
+          .option('database',NAME).option('collection',COLLECTION_MONGODB).save()
+    except:
+        pass
+    
+
+
 n_secs = 1
 topic = "testo"
 spark_session = SparkSession.builder \
@@ -21,7 +36,9 @@ sc.setLogLevel("WARN")
 ssc = StreamingContext(sc, n_secs)
 kafkaStream = KafkaUtils.createStream(ssc, "10.128.0.16:2181","kafkaReaders", {topic: 3})
 lines = kafkaStream.map(lambda x: x[1])
-counts = lines.flatMap(lambda line: line.split(" ")).map(lambda word: (word, 1)).reduceByKey(lambda a, b: a+b).toDF()
+
+counts = lines.flatMap(lambda line: line.split(" ")).map(lambda word: (word, 1)).reduceByKey(lambda a, b: a+b)\
+    .foreachRDD(lambda rdd: write_mongo(rdd))
 counts.write.format("mongo").mode("append").save()
 ssc.start()
 ssc.awaitTermination()
