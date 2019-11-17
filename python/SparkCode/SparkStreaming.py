@@ -8,14 +8,20 @@ from pyspark import SparkContext, SparkConf
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
 
+from pyspark.sql import SparkSession
 n_secs = 1
 topic = "testo"
-conf = SparkConf().setAppName("KafkaStreamProcessor")
-sc = SparkContext(conf=conf)
+spark_session = SparkSession.builder \
+    .appName("myApp") \
+    .config("spark.mongodb.input.uri", "mongodb://10.128.0.20/test.coll") \
+    .config("spark.mongodb.output.uri", "mongodb://10.128.0.20/test.coll") \
+    .getOrCreate()
+sc = spark_session.sparkContext
 sc.setLogLevel("WARN")
 ssc = StreamingContext(sc, n_secs)
-kafkaStream = KafkaUtils.createStream(ssc, "10.128.0.16:2181", {topic: 3})
+kafkaStream = KafkaUtils.createStream(ssc, "10.128.0.16:2181","kafkaReaders", {topic: 3})
 lines = kafkaStream.map(lambda x: x[1])
-counts = lines.flatMap(lambda line: line.split(" ")).map(lambda word: (word, 1)).reduceByKey(lambda a, b: a+b)
-counts.pprint()
+counts = lines.flatMap(lambda line: line.split(" ")).map(lambda word: (word, 1)).reduceByKey(lambda a, b: a+b).toDF()
+counts.write.format("mongo").mode("append").save()
 ssc.start()
+ssc.awaitTermination()
