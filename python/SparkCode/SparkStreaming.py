@@ -1,10 +1,6 @@
 import os
 
 os.environ['PYSPARK_SUBMIT_ARGS'] = '--jars ~/spark-streaming-kafka-0-8-assembly_2.11-2.4.4 pyspark-shell'
-
-import sys
-import time
-from pyspark import SparkContext, SparkConf
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
 
@@ -13,6 +9,7 @@ from pyspark.sql import SparkSession
 
 def write_mongo(rdd):
     print("entering function with data ")
+    print(rdd)
     for x in rdd.collect():
         print(x)
     NAME = 'test'
@@ -41,10 +38,10 @@ kafkaParams = {
     "auto.offset.reset": "smallest"
 }
 kafkaStream = KafkaUtils.createDirectStream(ssc, [topic], kafkaParams)
-# (ssc, "10.128.0.16:2181","kafkaReaders", {topic: 3})
 lines = kafkaStream.map(lambda x: x[1])
 
 counts = lines.flatMap(lambda line: line.split(" ")).map(lambda word: (word, 1)).reduceByKey(lambda a, b: a + b) \
     .foreachRDD(lambda rdd: write_mongo(rdd))
+print(counts)
 ssc.start()
 ssc.awaitTermination()
