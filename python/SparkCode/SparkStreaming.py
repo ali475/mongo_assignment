@@ -1,5 +1,7 @@
 import os
 
+from pyspark.shell import sqlContext
+
 os.environ['PYSPARK_SUBMIT_ARGS'] = '--jars ~/spark-streaming-kafka-0-8-assembly_2.11-2.4.4 pyspark-shell'
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
@@ -15,7 +17,9 @@ def write_mongo(rdd):
     NAME = 'test'
     COLLECTION_MONGODB = 'test'
     try:
-        rdd.save()
+        df = sqlContext.createDataFrame(rdd, ["word", "count"])
+        df.write.format("mongo").mode("append").save()
+
     except Exception as e:
         print("error{}".format(e))
         pass
