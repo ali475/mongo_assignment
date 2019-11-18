@@ -15,9 +15,7 @@ def write_mongo(rdd):
     NAME = 'test'
     COLLECTION_MONGODB = 'test'
     try:
-        rdd\
-            .format('com.mongodb.spark.sql.DefaultSource').mode('append') \
-            .option('database', NAME).option('collection', COLLECTION_MONGODB).save()
+        rdd.save()
     except Exception as e:
         print("error{}".format(e))
         pass
