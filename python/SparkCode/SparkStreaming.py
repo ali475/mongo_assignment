@@ -37,9 +37,9 @@ kafkaParams = {
 }
 kafkaStream = KafkaUtils.createDirectStream(ssc, [topic], kafkaParams)
 lines = kafkaStream.map(lambda x: x[1])
-
+lines.map(lambda word: (word, 1)).foreachRDD(lambda rdd: write_mongo(rdd))
 counts = lines.flatMap(lambda line: line.split(" ")).map(lambda word: (word, 1)).reduceByKey(lambda a, b: a + b) \
     .foreachRDD(lambda rdd: write_mongo(rdd))
-print(counts)
+
 ssc.start()
 ssc.awaitTermination()
